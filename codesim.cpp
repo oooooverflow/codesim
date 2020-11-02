@@ -17,6 +17,7 @@ int main(int argc, char *argv[]) {
         exit(-1);
     }
     Codesim *codesim = new Codesim();
+    // cout << argv[1] << " " << argv[2] << endl;
     codesim->parse_file(argv[1], argv[2]);
     codesim->gst();
     codesim->cal_sim();
@@ -24,6 +25,8 @@ int main(int argc, char *argv[]) {
 }
 
 void Codesim::parse_file(char *filename_1, char *filename_2) {
+    file1 = filename_1;
+    file2 = filename_1;
     CXIndex index = clang_createIndex(0, 0);
     CXTranslationUnit unit = clang_parseTranslationUnit(index, filename_1, nullptr, 0, nullptr, 0, CXTranslationUnit_None);
     if (unit == nullptr) {
@@ -65,7 +68,7 @@ void Codesim::parse_file(char *filename_1, char *filename_2) {
         return CXChildVisit_Recurse;
     },
     nullptr);
-    cout << "Success !" << endl;
+    // cout << "Success !" << endl;
 }
 
 void Codesim::gst() {
@@ -87,7 +90,7 @@ void Codesim::gst() {
                 break;
             }
             count = 0;
-            while(vec1[i].mark == false && vec2[i].mark == false && vec1[i+count].kind == vec2[i+count].kind) {
+            while(vec1[i].mark == false && vec2[j].mark == false && vec1[i+count].kind == vec2[j+count].kind) {
                 count++;
             }
             if(count >= max_match) {
@@ -103,14 +106,14 @@ void Codesim::gst() {
             }
             }
         }
+        if(max_match == min_match) {
+            break;
+        }
         for(int i = 0; i < matches.size(); i++) {
             for(int j = 0; j < matches[i].length; j++) {
                 vec1[matches[i].begin1+j].mark = true;
                 vec2[matches[i].begin2+j].mark = true;
             }
-        }
-        if(max_match == min_match) {
-            break;
         }
         matches.clear();
         max_match = min_match;
@@ -121,15 +124,19 @@ void Codesim::gst() {
 void Codesim::cal_sim() {
     long int length1 = 0, length2 = 0;
     for(int i = 0; i < vec1.size(); i++) {
+        // cout << vec1[i].kind << " " << vec1[i].mark << " ";
         if(vec1[i].mark) {
             length1++;
         }
     }
+    // cout << endl;
     for(int i = 0; i < vec2.size(); i++) {
+        // cout << vec2[i].kind << " " << vec2[i].mark << " ";
         if(vec2[i].mark) {
             length2++;
         }
     }
-    cout << "file1:" << (length1*1.0)/vec1.size() << endl;
-    cout << "file2:" << (length2*1.0)/vec2.size() << endl;
+    // cout << endl;
+    cout << file1 << ":" << (length1*1.0)/vec1.size() << endl;
+    cout << file1 << ":" << (length2*1.0)/vec2.size() << endl;
 }

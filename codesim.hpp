@@ -18,6 +18,7 @@ class Codesim {
         // };
         // vector<Node> vec1, vec2;
         long int min_match = 2;
+        string file1, file2;
 
     public:
         void parse_file(char *filename_1, char *filename_2);
