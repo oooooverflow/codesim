@@ -12,21 +12,41 @@ struct sub_str {
 vector<Node> vec1, vec2;
 
 int main(int argc, char *argv[]) {
-    if (argc != 3) {
-        cerr << "Please input 2 filename which will be detedted !" << endl;
+    bool verbose = false;
+    if(argc == 2 && (strcmp(argv[1], "--help")==0 || strcmp(argv[1], "-h")==0)) {
+        cout << "usage: codesim [-v|--verbose] [-h|--help] code1 code2" << endl;
+        return 0;
+    }
+    else if(argc == 4 && (strcmp(argv[1], "--verbose")==0 || strcmp(argv[1], "-v")==0)) {
+        // cout << "verbose!" << endl;
+        verbose = true;
+        // return 0;
+    }
+    else if(argc != 3) {
+        cerr << "type codesim [-h|--help] for help" << endl;
         exit(-1);
     }
-    Codesim *codesim = new Codesim();
+     
+    Codesim *codesim = new Codesim(verbose);
     // cout << argv[1] << " " << argv[2] << endl;
-    codesim->parse_file(argv[1], argv[2]);
+    if(argc == 3) {
+        codesim->parse_file(argv[1], argv[2]);
+    }
+    else {
+        codesim->parse_file(argv[2], argv[3]);
+    }
     codesim->gst();
     codesim->cal_sim();
     return 0;
 }
 
+Codesim::Codesim(bool verbose) {
+    this->verbose = verbose;
+}
+
 void Codesim::parse_file(char *filename_1, char *filename_2) {
     file1 = filename_1;
-    file2 = filename_1;
+    file2 = filename_2;
     CXIndex index = clang_createIndex(0, 0);
     CXTranslationUnit unit = clang_parseTranslationUnit(index, filename_1, nullptr, 0, nullptr, 0, CXTranslationUnit_None);
     if (unit == nullptr) {
@@ -123,20 +143,34 @@ void Codesim::gst() {
 
 void Codesim::cal_sim() {
     long int length1 = 0, length2 = 0;
+    if(verbose) {
+        cout << file1 << ": ";
+    }
     for(int i = 0; i < vec1.size(); i++) {
-        // cout << vec1[i].kind << " " << vec1[i].mark << " ";
+        if(verbose) {
+            cout << "kind: " << vec1[i].kind << " mark: " << vec1[i].mark << " ";
+        }
         if(vec1[i].mark) {
             length1++;
         }
     }
-    // cout << endl;
+    if(verbose) {
+        cout << endl << file2 << ": ";
+    }
     for(int i = 0; i < vec2.size(); i++) {
-        // cout << vec2[i].kind << " " << vec2[i].mark << " ";
+        if(verbose) {
+            cout << "kind: " << vec2[i].kind << " mark: " << vec2[i].mark << " ";
+        }
         if(vec2[i].mark) {
             length2++;
         }
     }
-    // cout << endl;
-    cout << file1 << ":" << (length1*1.0)/vec1.size() << endl;
-    cout << file1 << ":" << (length2*1.0)/vec2.size() << endl;
+    if(verbose) {
+        cout << endl;
+    }
+    // float res = (length1*1.0)/vec1.size() > (length2*1.0)/vec2.size() ? (length1*1.0)/vec1.size() : (length2*1.0)/vec2.size();
+    float res = (length1*1.0+length2*1.0)/(vec1.size()+vec2.size());
+    // cout << file1 << ":" << (length1*1.0)/vec1.size() << endl;
+    // cout << file1 << ":" << (length2*1.0)/vec2.size() << endl;
+    cout << res << endl;
 }
