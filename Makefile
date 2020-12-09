@@ -1,6 +1,6 @@
-make:codesim.cpp
-	g++ codesim.cpp -lclang -o codesim
-test:codesim
-	./codesim test.cpp test1.cpp
+make:src/codesim.cpp
+	g++ src/codesim.cpp -lclang -o src/codesim
+test:src/codesim
+	./src/codesim test/test1.cpp test/test2.cpp
 clean:
-	rm codesim
+	rm src/codesim
