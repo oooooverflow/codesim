@@ -1,5 +1,5 @@
 # CodeSim 
-A program for detecting code simularity between cpp files.
+A program for detecting code simularity between c/cpp files.
 
 ## Environment
 
